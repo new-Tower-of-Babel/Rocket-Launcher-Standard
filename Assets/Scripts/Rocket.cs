@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.UI;
 
 public class Rocket : MonoBehaviour
 {
@@ -12,7 +13,6 @@ public class Rocket : MonoBehaviour
     private int now_y;
     private int score;
     private int highScore;
-    private string saveHighScore;
 
     private Transform roketTransform;
     
@@ -21,6 +21,8 @@ public class Rocket : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI currentScoreTxt;
     [SerializeField] private TextMeshProUGUI HighScoreTxt;
+    [SerializeField] private Image fillImage;
+
 
 
     void Awake()
@@ -32,11 +34,21 @@ public class Rocket : MonoBehaviour
     private void Start()
     {
         score = (int)roketTransform.position.y;
-        //highScore = LoadData();
+        if (PlayerPrefs.HasKey("PlayerScore"))
+        {
+            highScore = LoadData();
+        }
     }
     private void Update()
     {
         Calculation_y();
+        HighScoreTxt.text = $"{highScore} M";
+        fillImage.fillAmount = fuel/100;
+        if (fillImage.fillAmount<1)
+        {
+            Debug.Log(fillImage.fillAmount);
+            fuel +=0.1f;
+        }
     }
 
     public void Shoot()
@@ -51,6 +63,7 @@ public class Rocket : MonoBehaviour
     }
     private void Calculation_y()
     {
+        
         now_y=(int)roketTransform.position.y;
         if (score<now_y)
         {
@@ -68,16 +81,22 @@ public class Rocket : MonoBehaviour
     {
         SaveData(highScore);
         SceneManager.LoadScene("RocketLauncher");
-        highScore = LoadData();
     }
     public void SaveData(int score)
     {
-        PlayerPrefs.SetInt(saveHighScore, score);
-        Debug.Log(saveHighScore);
+        PlayerPrefs.SetInt("PlayerScore", score);
     }
 
     public int LoadData()
     {
         return PlayerPrefs.GetInt("PlayerScore");
     }
+}
+public class RocketDashboard : Rocket
+{
+
+}
+public class RocketEnergySystem : Rocket
+{
+
 }
